@@ -110,7 +110,7 @@ int main(void)
   MX_UART7_Init();
   MX_USART10_UART_Init();
   /* USER CODE BEGIN 2 */
-    start_mission_planer_task(NULL);
+  start_mission_planer_task(NULL);
   /* USER CODE END 2 */
 
   /* Init scheduler */
