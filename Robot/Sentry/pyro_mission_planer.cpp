@@ -20,10 +20,10 @@ extern "C"
     {
         pyro_init_thread(NULL);
 
-        #if BOARD_ID == GIMBAL_ID
+        #if BOARD == GIMBAL_BOARD
             pyro_init_ret = sentry_gimbal_init(nullptr);
             pyro_init_ret = sentry_booster_init(nullptr);
-        #elif BOARD_ID == CHASSIS_ID
+        #elif BOARD == CHASSIS_BOARD
             pyro_init_ret = sentry_chassis_init(nullptr);
         #endif
 

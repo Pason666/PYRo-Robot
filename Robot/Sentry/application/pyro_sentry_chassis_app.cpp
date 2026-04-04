@@ -1,4 +1,3 @@
-#include "pyro_sentry_func_config.h"
 #if BOARD_ID == CHASSIS_ID
 
 #include "pyro_rud_chassis.h"
@@ -16,18 +15,6 @@
 #include "pyro_bsp_uart.h"
 
 using namespace pyro;
-
-// ------------------- 函数声明 -------------------
-void chassis_config(rud_cfg_t &rud_cfg);
-void yaw_config(yaw_cfg_t &yaw_cfg);
-void gimbal2chassis();
-void imu2chassis();
-void referee_process(const referee_drv_t *referee_drv);
-void chassis2gimbal();
-void mcu2nav_process();
-void sentry_chassis_thread(void *argument);
-status_t sentry_chassis_init(void *argument);
-
 // ------------------- 全局对象定义 -------------------
 rud_chassis_t *rud_chassis_ptr             = nullptr;
 rud_cmd_t *rud_cmd_ptr                     = nullptr;
@@ -241,6 +228,7 @@ extern "C"
         can_tx_drv_t::add_data(0x102, 8, bullet_speed_dec);
         can_tx_drv_t::add_data(0x102, 8, enemy_color);
         can_tx_drv_t::add_data(0x102, 8, power_heat);
+        can_tx_drv_t::add_data(0x102, 8, in_aim);
         can_tx_drv_t::add_data(0x102, 1, game_started);
         can_tx_drv_t::add_data(0x102, 1, scan);
         can_tx_drv_t::send(0x102, can_hub_t::get_instance()->hub_get_can_obj(
