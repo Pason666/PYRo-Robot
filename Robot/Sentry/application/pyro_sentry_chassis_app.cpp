@@ -13,6 +13,7 @@
 #include "pyro_powermeter.h"
 #include "protocol.h"
 #include "pyro_sentry_message_frame.h"
+#include "pyro_bsp_uart.h"
 
 using namespace pyro;
 
@@ -185,8 +186,15 @@ extern "C"
             {
                 rud_cmd_ptr->vx                   = nav2mcu_msg.data.vx;
                 rud_cmd_ptr->vy                   = nav2mcu_msg.data.vy;
-                rud_cmd_ptr->wz                   = 10;
-                yaw_cmd_ptr->target_yaw_imu_angle = nav2mcu_msg.data.wz;
+                if (nav2mcu_msg.data.wz != 0)
+                {
+                    rud_cmd_ptr->wz = nav2mcu_msg.data.wz;
+                }
+                else
+                {
+                    rud_cmd_ptr->wz = 10;
+                }
+                yaw_cmd_ptr->target_yaw_imu_angle = nav2mcu_msg.data.yaw;
             }
 
             rud_cmd_ptr->yaw_error = yaw_ptr->get_yaw_error();
@@ -225,13 +233,16 @@ extern "C"
         bool game_started   = referee_data.game_status.game_progress == 4;
         uint8_t power_heat =
             referee_data.power_heat.shooter_17mm_barrel_heat / 10;
+        uint8_t in_aim = nav2mcu_msg.data.in_aim;
+        bool scan     = nav2mcu_msg.data.scan;
 
         can_tx_drv_t::clear(0x102);
         can_tx_drv_t::add_data(0x102, 8, bullet_speed_int);
         can_tx_drv_t::add_data(0x102, 8, bullet_speed_dec);
         can_tx_drv_t::add_data(0x102, 8, enemy_color);
-        can_tx_drv_t::add_data(0x102, 8, game_started);
         can_tx_drv_t::add_data(0x102, 8, power_heat);
+        can_tx_drv_t::add_data(0x102, 1, game_started);
+        can_tx_drv_t::add_data(0x102, 1, scan);
         can_tx_drv_t::send(0x102, can_hub_t::get_instance()->hub_get_can_obj(
                                       can_hub_t::which_can::can3));
     }
@@ -289,7 +300,7 @@ extern "C"
         rud_cfg_ptr = new rud_cfg_t();
         yaw_cmd_ptr = new yaw_cmd_t();
         yaw_cfg_ptr = new yaw_cfg_t();
-        comm        = new uart_comm_t(uart_comm_t::, 0x01);
+        comm        = new uart_comm_t(PYRO_UART10, 0x01);
 
         // 注册区域
         mcu2nav_msg.header.sof = 0xA5;

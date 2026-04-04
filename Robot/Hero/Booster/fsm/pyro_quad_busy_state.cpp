@@ -1,0 +1,27 @@
+#include "pyro_quad_booster.h"
+
+namespace pyro
+{
+
+void quad_booster_t::fsm_active_t::state_busy_t::enter(owner *owner)
+{
+
+}
+
+void quad_booster_t::fsm_active_t::state_busy_t::execute(owner *owner)
+{
+    float error = owner->_ctx.data.target_trig_rad - owner->_ctx.data.current_trig_rad;
+    if (abs(error) < 0.12f)
+    {
+        request_switch(&owner->_state_active._interim_state);
+    }
+    owner->_trigger_position_control();
+    owner->_send_trigger_command();
+}
+
+void quad_booster_t::fsm_active_t::state_busy_t::exit(owner *owner)
+{
+
+}
+
+}
