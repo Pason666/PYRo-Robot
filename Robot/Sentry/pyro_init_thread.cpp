@@ -1,4 +1,3 @@
-#include "pyro_sentry_func_config.h"
 #include "pyro_bsp_uart.h"
 #include "pyro_can_drv.h"
 #include "pyro_dr16_rc_drv.h"

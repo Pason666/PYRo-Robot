@@ -81,14 +81,17 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
     stm32cubemx
     CMSISDSP
     dsppp_lib
-if (ROBOT_ID EQUAL HERO_ID)
-    Hero
-elseif(ROBOT_ID EQUAL SENTRY_ID)
-    Sentry
-endif ()
-
-
 )
+
+if (ROBOT_ID EQUAL HERO_ID)
+target_link_libraries(${CMAKE_PROJECT_NAME}
+    Hero
+)
+elseif(ROBOT_ID EQUAL SENTRY_ID)
+target_link_libraries(${CMAKE_PROJECT_NAME}
+    Sentry
+)
+endif ()
 
 add_dependencies(echo_robot_id ${CMAKE_PROJECT_NAME})
 

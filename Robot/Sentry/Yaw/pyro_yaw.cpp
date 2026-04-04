@@ -19,6 +19,15 @@ float yaw_t::get_yaw_error() const
     return -_ctx.data.current_yaw_angle;
 }
 
+float wrap_pi(float rad)
+{
+    while (rad > PI)
+        rad -= 2 * PI;
+    while (rad < -PI)
+        rad += 2 * PI;
+    return rad;
+}
+
 status_t yaw_t::_init()
 {
     if (_module_deps.motor.yaw == nullptr)

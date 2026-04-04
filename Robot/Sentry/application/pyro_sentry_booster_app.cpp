@@ -1,4 +1,3 @@
-#include "pyro_sentry_func_config.h"
 #if BOARD_ID == GIMBAL_ID
 
 #include "pyro_17mm_booster.h"
