@@ -31,14 +31,14 @@ void gimbal_t::_update_feedback()
     _ctx.data.current_pitch_rad =
         _ctx.gimbal_config.motor.pitch->get_current_position();
 
-    _ctx.data.current_pitch_rad = wrap_pi(_ctx.data.current_pitch_rad);
+    _ctx.data.current_pitch_rad = wrap2pi_f32(_ctx.data.current_pitch_rad);
     _ctx.data.current_pitch_radps =
         _ctx.gimbal_config.motor.pitch->get_current_rotate();
 
     _ctx.data.current_yaw_rad =
         _ctx.gimbal_config.motor.yaw->get_current_position() -
         _ctx.gimbal_config.yaw_offset;
-    _ctx.data.current_yaw_rad = wrap_pi(_ctx.data.current_yaw_rad);
+    _ctx.data.current_yaw_rad = wrap2pi_f32(_ctx.data.current_yaw_rad);
 
     _ctx.data.current_yaw_radps =
         _ctx.gimbal_config.motor.yaw->get_current_rotate();

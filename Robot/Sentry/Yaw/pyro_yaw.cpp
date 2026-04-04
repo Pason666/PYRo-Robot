@@ -19,15 +19,6 @@ float yaw_t::get_yaw_error() const
     return -_ctx.data.current_yaw_angle;
 }
 
-float wrap_pi(float rad)
-{
-    while (rad > PI)
-        rad -= 2 * PI;
-    while (rad < -PI)
-        rad += 2 * PI;
-    return rad;
-}
-
 status_t yaw_t::_init()
 {
     if (_module_deps.motor.yaw == nullptr)
@@ -52,7 +43,7 @@ void yaw_t::_update_feedback()
 
     // yaw轴当前角度（电机角度， -PI ~ PI）
     _ctx.data.current_yaw_angle =
-        wrap_pi(_ctx.yaw_config.motor.yaw->get_current_position() -
+        wrap2pi_f32(_ctx.yaw_config.motor.yaw->get_current_position() -
                 _ctx.yaw_config.yaw_offset);
 
     // 这里需要获取底盘imu数据减去大yaw的机械角度得到yaw轴的imu角度
@@ -64,7 +55,7 @@ void yaw_t::_update_feedback()
     _ctx.data.chassis_wz = chassis_yaw_radps;
 
     _ctx.data.current_yaw_imu_angle =
-        wrap_pi(yaw - _ctx.data.current_yaw_angle);
+        wrap2pi_f32(yaw - _ctx.data.current_yaw_angle);
 
     // yaw电机当前角速度
     _ctx.data.current_yaw_radps =

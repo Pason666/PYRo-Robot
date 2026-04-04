@@ -53,7 +53,7 @@ void gimbal_t::fsm_active_t::state_scanning_t::execute(owner *owner)
             pitch_direction = UP;
     }
 
-    owner->_ctx.data.target_yaw_rad = wrap_pi(owner->_ctx.data.target_yaw_rad);
+    owner->_ctx.data.target_yaw_rad = wrap2pi_f32(owner->_ctx.data.target_yaw_rad);
     yaw_tangle                      = owner->_ctx.data.target_yaw_rad;
     yaw_cangle                      = owner->_ctx.data.current_yaw_rad;
     if (yaw_direction)

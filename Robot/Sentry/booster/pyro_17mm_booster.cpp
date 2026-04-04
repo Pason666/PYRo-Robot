@@ -45,7 +45,7 @@ void shoot_17mm_control_t::_update_feedback()
         float delta_rad = current_rotor_rad - _ctx.data.last_rotor_rad;
 
         // 2. 处理跨圈突变边界 (0 <-> 2PI 或 -PI <-> PI)
-        delta_rad       = wrap_pi(delta_rad);
+        delta_rad       = wrap2pi_f32(delta_rad);
 
         // 3. 将物理增量除以减速比，累加到连续的拨弹盘世界角度中
         _ctx.data.current_trig_rad += delta_rad / TRIGGER_GEAR_RATIO;

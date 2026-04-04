@@ -26,10 +26,10 @@ void gimbal_t::fsm_active_t::state_tracking_t::execute(gimbal_t *owner)
     ins->get_rads_b(&yaw, &pitch, &roll);
 
     owner->_ctx.data.aim_imu_max_yaw =
-        wrap_pi(yaw + (owner->_ctx.gimbal_config.yaw_max_rad -
+        wrap2pi_f32(yaw + (owner->_ctx.gimbal_config.yaw_max_rad -
                        owner->_ctx.data.current_yaw_rad));
     owner->_ctx.data.aim_imu_min_yaw =
-        wrap_pi(yaw + (owner->_ctx.gimbal_config.yaw_min_rad -
+        wrap2pi_f32(yaw + (owner->_ctx.gimbal_config.yaw_min_rad -
                        owner->_ctx.data.current_yaw_rad));
 
     // ------------------没经过测试，但是我觉得这样就可以-----------------
@@ -63,9 +63,9 @@ void gimbal_t::fsm_active_t::state_tracking_t::execute(gimbal_t *owner)
                 owner->_ctx.data.aim_imu_max_yaw &&
             owner->_ctx.data.target_yaw_rad < owner->_ctx.data.aim_imu_min_yaw)
         {
-            float dist_to_max = fabs(wrap_pi(owner->_ctx.data.target_yaw_rad -
+            float dist_to_max = fabs(wrap2pi_f32(owner->_ctx.data.target_yaw_rad -
                                              owner->_ctx.data.aim_imu_max_yaw));
-            float dist_to_min = fabs(wrap_pi(owner->_ctx.data.target_yaw_rad -
+            float dist_to_min = fabs(wrap2pi_f32(owner->_ctx.data.target_yaw_rad -
                                              owner->_ctx.data.aim_imu_min_yaw));
             owner->_ctx.data.target_yaw_rad =
                 dist_to_max < dist_to_min ? owner->_ctx.data.aim_imu_max_yaw
