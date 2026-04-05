@@ -22,7 +22,7 @@ status_t quad_booster_t::_init()
     _ctx.pid = _module_deps.pid_deps;
     // 3. 弹速控制初始化
     can_rx_drv_t::subscribe(can_hub_t::can1, 0x135);
-    _ctx.pid.ball_speed_pid = new pid_t(0.25f, 0.0f, 0.005f, 0.0f, 2.0f);
+    _ctx.pid.ball_speed_pid = new pid_t(0.32f, 0.0f, 0.005f, 0.0f, 2.0f);
 
     return PYRO_OK;
 }

@@ -94,12 +94,33 @@ void screw_gimbal_t::_update_feedback()
 void screw_gimbal_t::_gimbal_control()
 {
     // --- Pitch 串级控制 ---
-    // 反馈量改用通过电机逆解算出的绝对顺滑数据
+    // 1. 位置环：解算目标角速度
     _ctx.data.target_pitch_radps = _ctx.pid.pitch_pos->calculate(
         _ctx.data.target_pitch_rad, _ctx.data.current_pitch_motor_rad);
 
-    _ctx.data.out_pitch_torque = _ctx.pid.pitch_spd->calculate(
+    // 2. 速度环：解算初始 PID 输出力矩
+    float pitch_pid_out = _ctx.pid.pitch_spd->calculate(
         _ctx.data.target_pitch_radps, _ctx.data.current_pitch_motor_radps);
+
+    // 3. 前馈/摩擦补偿：由于丝杠自锁，纯根据速度方向与当前角度给入动态摩擦力矩补偿
+    float pitch_ff_torque = _calculate_pitch_compensation(
+        _ctx.data.current_pitch_motor_rad,
+        _ctx.data.target_pitch_radps
+    );
+
+    // === 基于前馈优先原则的动态限幅 ===
+    // a. 优先保证前馈，但前馈自身也不能超过物理极限
+    pitch_ff_torque = std::clamp(pitch_ff_torque, -SCREW_MAX_TORQUE, SCREW_MAX_TORQUE);
+
+    // b. 扣除前馈后，计算 PID 可用的动态力矩上下限 (Margin)
+    float pid_torque_max = SCREW_MAX_TORQUE - pitch_ff_torque;
+    float pid_torque_min = -SCREW_MAX_TORQUE - pitch_ff_torque;
+
+    // c. 对 PID 反馈输出进行严格限幅
+    pitch_pid_out = std::clamp(pitch_pid_out, pid_torque_min, pid_torque_max);
+
+    // 4. 最终合成力矩 (总输出被完美限制在 [-SCREW_MAX_TORQUE, SCREW_MAX_TORQUE] 内)
+    _ctx.data.out_pitch_torque = pitch_pid_out + pitch_ff_torque;
 
     // --- Yaw 串级控制 ---
     _ctx.data.target_yaw_radps = _ctx.pid.yaw_pos->calculate(
@@ -261,6 +282,59 @@ float screw_gimbal_t::_motor_radps_to_pitch_radps(float motor_radps, float curre
     if (std::abs(dMotor_dpitch) < 0.001f) return 0.0f;
 
     return motor_radps / dMotor_dpitch;
+}
+float screw_gimbal_t::_calculate_pitch_compensation(float current_pitch_rad, float target_pitch_radps) const
+{
+    // ==========================================
+    // 1. 基准映射: 将 -0.1 处的动态摩擦力矩 3.0 转化为关节端等效阻力
+    // ==========================================
+    const float ref_pitch = -0.1f;
+    const float ref_theta = SCREW_THETA_ZERO_RAD + ref_pitch;
+    const float ref_S = std::sqrt(SCREW_L1_SQ_PLUS_L2_SQ - SCREW_TWO_L1_L2 * std::cos(ref_theta));
+    const float ref_dS_dpitch = (SCREW_TWO_L1_L2 * std::sin(ref_theta)) / (2.0f * ref_S);
+    const float ref_dMotor_dpitch = ref_dS_dpitch * 2.0f * PI;
+
+    // 基准点电机摩擦力矩为 3.0，计算关节端/传动链路等效常数摩擦力
+    const float ref_friction_torque = 3.0f;
+    const float equivalent_joint_friction = ref_friction_torque * ref_dMotor_dpitch;
+
+    // ==========================================
+    // 2. 根据当前机械传动比，算出目前角度所需克服的电机摩擦力矩幅值
+    // ==========================================
+    const float theta_rad = SCREW_THETA_ZERO_RAD + current_pitch_rad;
+    float current_S = std::sqrt(SCREW_L1_SQ_PLUS_L2_SQ - SCREW_TWO_L1_L2 * std::cos(theta_rad));
+    if (current_S < 1.0f) current_S = 1.0f; // 防止除零
+
+    const float dS_dpitch = (SCREW_TWO_L1_L2 * std::sin(theta_rad)) / (2.0f * current_S);
+    const float current_dMotor_dpitch = dS_dpitch * 2.0f * PI;
+
+    float current_friction_mag = 0.0f;
+    if (std::abs(current_dMotor_dpitch) > 0.001f)
+    {
+        current_friction_mag = equivalent_joint_friction / current_dMotor_dpitch;
+    }
+
+    // ==========================================
+    // 3. 根据目标运动速度方向决定符号
+    // ==========================================
+    float dynamic_friction_comp = 0.0f;
+
+    // 引入速度死区 (Deadband)，防止在极小误差下正负跳变
+    const float velocity_deadband = 0.01f;
+
+    if (target_pitch_radps > velocity_deadband)
+    {
+        // 期望正向运动，给正向力矩抵消摩擦
+        dynamic_friction_comp = current_friction_mag;
+    }
+    else if (target_pitch_radps < -velocity_deadband)
+    {
+        // 期望反向运动，给反向力矩抵消摩擦
+        dynamic_friction_comp = -current_friction_mag;
+    }
+
+
+    return dynamic_friction_comp;
 }
 
 void screw_gimbal_t::_fsm_execute()

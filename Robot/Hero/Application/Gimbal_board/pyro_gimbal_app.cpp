@@ -44,6 +44,10 @@ extern "C"
                 chassis_dr162cmd();
                 gimbal_dr162cmd();
             }
+            else
+            {
+                screw_gimbal_cmd_ptr->mode = pyro::cmd_base_t::mode_t::PASSIVE;
+            }
             screw_gimbal_ptr->set_command(*screw_gimbal_cmd_ptr);
             vTaskDelay(1);
         }
@@ -125,22 +129,24 @@ void chassis_dr162cmd()
     wz     = 0;
     active = true;
 
-    if (pyro::sw_pos_t::DOWN != vrc.switches.left.current_pos)
-    {
-        track_en = true;
-        if (pyro::sw_pos_t::MID == vrc.switches.left.current_pos)
-        {
-            leg_retract = true;
-        }
-        else
-        {
-            leg_retract = false;
-        }
-    }
-    else
-    {
-        track_en = true;
-    }
+    // if (pyro::sw_pos_t::DOWN != vrc.switches.left.current_pos)
+    // {
+    //     track_en = true;
+    //     if (pyro::sw_pos_t::MID == vrc.switches.left.current_pos)
+    //     {
+    //         leg_retract = true;
+    //     }
+    //     else
+    //     {
+    //         leg_retract = false;
+    //     }
+    // }
+    // else
+    // {
+    //     track_en = true;
+    // }
+
+    track_en = false;
 
     pyro::can_tx_drv_t::add_data(0x101, 8, vx);
     pyro::can_tx_drv_t::add_data(0x101, 8, vy);
@@ -170,12 +176,10 @@ void gimbal_vt032cmd()
     screw_gimbal_cmd_ptr->auto_aim = false; // 清除外部视觉依赖，仅走手控
 
     // 补偿归一化乘积
-    float raw_mouse_y = vrc.mouse_axes.y * 32768.0f;
-    float raw_mouse_x = vrc.mouse_axes.x * 32768.0f;
     screw_gimbal_cmd_ptr->pitch_delta_angle =
-        -vrc.axes.ry * 0.0025f - raw_mouse_y * 0.25f;
+        -vrc.axes.ry * 0.0025f - vrc.mouse_axes.y * 0.25f;
     screw_gimbal_cmd_ptr->yaw_delta_angle =
-        -vrc.axes.rx * 0.0025f - raw_mouse_x * 0.6f;
+        -vrc.axes.rx * 0.0025f - vrc.mouse_axes.x * 0.6f;
 }
 
 void chassis_vt032cmd(uint32_t notify_val)
@@ -268,15 +272,15 @@ void deps_init()
 
     // 3. 初始化串级 PID
     screw_gimbal_deps->pid_deps.pitch_pos =
-        new pid_t(10.6f, 0.15f, 0.8f, 1.0f, 6.0f, 40, 10,
+        new pid_t(11.5f, 0.108f, 0.01f, 0.5f, 10.0f, 40, 10,
                   4); // 位置环输出为 rad/s，限制在电机可接受范围内
     screw_gimbal_deps->pid_deps.pitch_spd =
-        new pid_t(5.0f, 0.0f, 0.2f, 0.0f, 10.0f, 20, 10,
+        new pid_t(22.0f, 0.102f, 0.014f, 1.0f, 20.0f, 20, 10,
                   4); // 输出限制匹配电机 Nm 级
 
     // Yaw 轴 (DJI GM6020，输出为电流值/电压值，通常量级较大，如 +/- 30000)
     screw_gimbal_deps->pid_deps.yaw_pos =
-        new pid_t(5.2f, 0.01f, 0.22f, 0.8f, 5.0f);
+        new pid_t(6.2f, 0.01f, 0.22f, 0.8f, 10.0f);
     screw_gimbal_deps->pid_deps.yaw_spd =
-        new pid_t(3.0f, 0.0003f, 0.0001f, 0.2f, 3.0f);
+        new pid_t(4.0f, 0.0003f, 0.0001f, 0.2f, 3.0f);
 }

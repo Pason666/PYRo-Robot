@@ -36,17 +36,17 @@ extern "C"
         ins_drv->init();
 
 #ifdef DR16_UART
-        DR16_UART.reset(100000, UART_WORDLENGTH_9B, UART_STOPBITS_2,
-                        UART_PARITY_EVEN);
         dr16_drv_t::instance().start();
         dr16_drv_t::instance().enable();
+        DR16_UART.reset(100000, UART_WORDLENGTH_9B, UART_STOPBITS_2,
+                UART_PARITY_EVEN);
 #endif
 
 #ifdef VT03_UART
-        VT03_UART.reset(921600, UART_WORDLENGTH_8B, UART_STOPBITS_1,
-                        UART_PARITY_NONE);
         vt03_drv_t::instance().start();
         vt03_drv_t::instance().enable();
+        VT03_UART.reset(921600, UART_WORDLENGTH_8B, UART_STOPBITS_1,
+                UART_PARITY_NONE);
 #endif
 
 #ifdef REFEREE_UART

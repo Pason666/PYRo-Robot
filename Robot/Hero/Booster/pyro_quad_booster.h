@@ -14,12 +14,12 @@ namespace pyro
 // =========================================================
 struct quad_booster_cmd_t final : public cmd_base_t
 {
-    bool fric_on;     // 摩擦轮开启
-    bool fire_enable; // 拨弹开启
+    bool fric_on;       // 摩擦轮开启
+    uint8_t fire_count; // 拨弹计数器，替代 fire_enable
     float target_speed;
 
     quad_booster_cmd_t()
-        : fric_on(false), fire_enable(false), target_speed(0.0f)
+        : fric_on(false), fire_count(0), target_speed(0.0f)
     {
     }
 };
@@ -101,10 +101,12 @@ class quad_booster_t final
 
     struct data_ctx_t
     {
+        uint8_t internal_fire_count{0}; // 内部拨弹计数器追踪
+
         float launch_delay_timer[3]{}; // 发射延时计时器
         float signal_timer{0};         // 信号持续时间计时器
         float avg_launch_delay{0};      // 平均发射延时
-        uint32_t fresh_timer{0};       // <-- 新增：发弹延迟计算的刷新计时器
+        uint32_t fresh_timer{0};       // 发弹延迟计算的刷新计时器
 
         // 反馈
         float abs_current_fric_mps[4]{}; // 绝对值，用于发弹延迟计算
@@ -127,7 +129,7 @@ class quad_booster_t final
     struct shoot_data_t
     {
         float ball_speed[3]{};
-        float fric1_mps = 15.3f;
+        float fric1_mps = 11.3f;
         float fric2_mps = 8.0f;
     };
 

@@ -96,6 +96,9 @@ class screw_gimbal_t final
     float _motor_radps_to_pitch_radps(float motor_radps,
                                       float current_motor_rad) const;
 
+    // --- 新增：摩擦与重力矩前馈补偿 ---
+    float _calculate_pitch_compensation(float current_pitch_rad, float target_pitch_radps) const;
+
     // --- 成员变量 ---
 
     // 上电校准逻辑暂存

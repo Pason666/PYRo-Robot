@@ -19,9 +19,9 @@ extern "C"
 
 #if BOARD == GIMBAL_BOARD
         xTaskCreate(hero_gimbal_init, "pyro_gimbal_init", 512, nullptr,
-                    configMAX_PRIORITIES - 1, nullptr);
+                    configMAX_PRIORITIES - 2, nullptr);
         xTaskCreate(hero_booster_init, "pyro_booster_init", 512, nullptr,
-                    configMAX_PRIORITIES - 1, nullptr);
+                    configMAX_PRIORITIES - 2, nullptr);
 #elif BOARD == CHASSIS_BOARD
         xTaskCreate(hero_chassis_init, "pyro_chassis_init", 512, nullptr,
                     configMAX_PRIORITIES - 1, nullptr);

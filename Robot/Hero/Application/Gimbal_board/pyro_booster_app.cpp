@@ -34,7 +34,7 @@ extern "C"
         {
             quad_booster_cmd_ptr->mode        = pyro::cmd_base_t::mode_t::PASSIVE;
             quad_booster_cmd_ptr->fric_on     = false;
-            quad_booster_cmd_ptr->fire_enable = false;
+            // 移除手动清零，交由底层状态机自动同步处理
             return;
         }
 
@@ -52,7 +52,8 @@ extern "C"
         {
             if (notify_val & EVENT_BIT_FIRE)
             {
-                quad_booster_cmd_ptr->fire_enable = true;
+                // [修改] 发射脉冲触发时，计数器自增
+                quad_booster_cmd_ptr->fire_count++;
             }
         }
     }
@@ -66,12 +67,12 @@ extern "C"
         {
             quad_booster_cmd_ptr->mode        = pyro::cmd_base_t::mode_t::PASSIVE;
             quad_booster_cmd_ptr->fric_on     = false;
-            quad_booster_cmd_ptr->fire_enable = false;
+            // 移除手动清零，交由底层状态机自动同步处理
             return;
         }
 
         quad_booster_cmd_ptr->mode         = pyro::cmd_base_t::mode_t::ACTIVE;
-        quad_booster_cmd_ptr->target_speed = 11.5f; // 可调节
+        quad_booster_cmd_ptr->target_speed = 11.7f; // 可调节
 
         if (notify_val & EVENT_BIT_FRIC_TOGGLE)
         {
@@ -81,7 +82,8 @@ extern "C"
         // 处理手柄与键鼠单发脉冲
         if (notify_val & EVENT_BIT_FIRE)
         {
-            quad_booster_cmd_ptr->fire_enable = true;
+            // [修改] 发射脉冲触发时，计数器自增
+            quad_booster_cmd_ptr->fire_count++;
         }
     }
 
@@ -92,7 +94,8 @@ extern "C"
             uint32_t notify_val = 0;
             xTaskNotifyWait(0x00, UINT32_MAX, &notify_val, 0);
 
-            quad_booster_cmd_ptr->fire_enable = false;
+            // [修改] 移除了 quad_booster_cmd_ptr->fire_enable = false;
+            // 我们现在依赖计数器，无需每帧强制复位
 
             if (vt03_drv_t::instance().check_online())
             {

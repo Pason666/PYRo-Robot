@@ -5,14 +5,19 @@ namespace pyro
 {
 void quad_booster_t::fsm_active_t::state_ready_t::enter(owner *owner)
 {
-
+    // 进入 ready 状态时，强制同步内部计数器与外部命令，
+    // 清除在非 ready 状态期间（如 interim, busy, stall）累积的所有误触发开火指令。
+    owner->_ctx.data.internal_fire_count = owner->_ctx.cmd->fire_count;
 }
 
 void quad_booster_t::fsm_active_t::state_ready_t::execute(owner *owner)
 {
-    if (owner->_ctx.cmd->fire_enable)
+    // 检查命令计数器是否与内部追踪计数器不一致，不一致说明有新的开火请求
+    if (owner->_ctx.cmd->fire_count != owner->_ctx.data.internal_fire_count)
     {
-        owner->_ctx.cmd->fire_enable = false;
+        // 立即同步计数器，防止重复发弹或连发
+        owner->_ctx.data.internal_fire_count = owner->_ctx.cmd->fire_count;
+
         owner->_ctx.data.signal_timer = dwt_drv_t::get_timeline_ms();
         owner->_ctx.data.target_trig_rad -= PI / 3.0f; // 每次拨弹60度
         request_switch(&owner->_state_active._busy_state);
@@ -36,4 +41,4 @@ void quad_booster_t::fsm_active_t::state_ready_t::exit(owner *owner)
 {
 
 }
-}
+} // namespace pyro
