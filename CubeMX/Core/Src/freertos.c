@@ -46,7 +46,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
-
+osThreadId_t mission_planer_Handle;
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
@@ -55,13 +55,21 @@ const osThreadAttr_t defaultTask_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
+/* Definitions for mission_planner */
+osThreadId_t mission_plannerHandle;
+const osThreadAttr_t mission_planner_attributes = {
+  .name = "mission_planner",
+  .stack_size = 1024 * 4,
+  .priority = (osPriority_t) osPriorityHigh,
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
-
+void start_mission_planer_task(void const * argument);
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);
+void start_mission_planner_task(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -159,6 +167,9 @@ void MX_FREERTOS_Init(void) {
   /* creation of defaultTask */
   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
+  /* creation of mission_planner */
+  mission_plannerHandle = osThreadNew(start_mission_planner_task, NULL, &mission_planner_attributes);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -185,6 +196,24 @@ void StartDefaultTask(void *argument)
     osDelay(1);
   }
   /* USER CODE END StartDefaultTask */
+}
+
+/* USER CODE BEGIN Header_start_mission_planner_task */
+/**
+* @brief Function implementing the mission_planner thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_start_mission_planner_task */
+__weak void start_mission_planner_task(void *argument)
+{
+  /* USER CODE BEGIN start_mission_planner_task */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END start_mission_planner_task */
 }
 
 /* Private application code --------------------------------------------------*/

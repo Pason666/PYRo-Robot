@@ -200,13 +200,13 @@ void rud_chassis_t::_chassis_control(rud_ctx_t *ctx)
     {
         // 平均分配
         power_controller.calculate_restricted_torques(
-            motor_data.data(), POWERCONTROL_NUM, power_limit + 100);
+            motor_data.data(), POWERCONTROL_NUM, power_limit + 100, referee_drv_t::get_instance()->get_data().power_heat.buffer_energy);
     }
     else
     {
         // 平均分配
         power_controller.calculate_restricted_torques(
-        motor_data.data(), POWERCONTROL_NUM, power_limit);
+        motor_data.data(), POWERCONTROL_NUM, power_limit, referee_drv_t::get_instance()->get_data().power_heat.buffer_energy);
     }
 
     // 不平均分配

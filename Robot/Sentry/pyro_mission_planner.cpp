@@ -16,7 +16,7 @@ extern "C"
     extern status_t sentry_booster_init(void *argument);
     extern status_t sentry_chassis_init(void *argument);
 
-    void start_mission_planer_task(void const *argument)
+    void start_mission_planner_task(void const *argument)
     {
         pyro_init_thread(NULL);
 
@@ -31,6 +31,6 @@ extern "C"
             start_debug_task(NULL);
         #endif
 
-        osThreadTerminate(NULL);
+        vTaskDelete(NULL);
     }
 }

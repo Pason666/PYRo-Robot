@@ -94,14 +94,8 @@ extern "C"
 
     void chassis2booster()
     {
-        std::array<uint8_t, 8> raw_data{};
-        can_rx_drv_t::get_data(can_hub_t::which_can::can3, 0x102, raw_data);
-
-        booster_cmd_ptr->current_bullet_mps =
-            raw_data[0] + raw_data[1] / 100.0f;
-        booster_cmd_ptr->ammo_count =
-            static_cast<int16_t>(raw_data[2] << 8 | raw_data[3]);
-        booster_cmd_ptr->power_heat = raw_data[5];
+        booster_cmd_ptr->current_bullet_mps = bullet_speed;
+        booster_cmd_ptr->power_heat = power_heat;
     }
 
     // void speed_control(void)

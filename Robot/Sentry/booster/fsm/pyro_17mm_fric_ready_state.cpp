@@ -7,7 +7,8 @@ void shoot_17mm_control_t::state_ready_fric_t::enter(owner *ctx)
 {
     ctx->_ctx.data.target_fric_radps[0] = -ctx->_ctx.booster_cfg.target_fric_speed;
     ctx->_ctx.data.target_fric_radps[1] = ctx->_ctx.booster_cfg.target_fric_speed;
-    ctx->_ctx.data.fric_pid_active      = true;
+    ctx->_ctx.booster_cfg.motor.fric[0]->enable();
+    ctx->_ctx.booster_cfg.motor.fric[1]->enable();
 }
 void shoot_17mm_control_t::state_ready_fric_t::execute(owner *ctx)
 {

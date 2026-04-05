@@ -80,15 +80,10 @@ void shoot_17mm_control_t::_fric_control(shoot_17mm_control_t *ctx)
 {
     for (int i = 0; i < 2; i++)
     {
-        if (ctx->_ctx.data.fric_pid_active)
-        {
-            ctx->_ctx.data.out_fric_torque[i] =
-                ctx->_ctx.booster_cfg.pid.fric_pid[i]->calculate(
-                    ctx->_ctx.data.target_fric_radps[i],
-                    ctx->_ctx.data.current_fric_radps[i]);
-        }
-        else
-            ctx->_ctx.data.out_fric_torque[i] = 0.0f;
+        ctx->_ctx.data.out_fric_torque[i] =
+            ctx->_ctx.booster_cfg.pid.fric_pid[i]->calculate(
+                ctx->_ctx.data.target_fric_radps[i],
+                ctx->_ctx.data.current_fric_radps[i]);
     }
 }
 
@@ -108,7 +103,7 @@ void shoot_17mm_control_t::_trig_control(shoot_17mm_control_t *ctx)
             ctx->_ctx.data.target_trig_radps,
             ctx->_ctx.data.current_trig_radps);
 
-    if (!ctx->_ctx.data.trig_pid_active || !ctx->_ctx.cmd->fire_licence)
+    if (!ctx->_ctx.cmd->fire_licence)
     {
         ctx->_ctx.data.out_trig_torque = 0.0f;
     }

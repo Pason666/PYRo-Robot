@@ -5,13 +5,14 @@ namespace pyro
 
 void shoot_17mm_control_t::state_stop_t::enter(owner *ctx)
 {
+    ctx->_ctx.booster_cfg.motor.fric[0]->enable();
+    ctx->_ctx.booster_cfg.motor.fric[1]->enable();
     ctx->_ctx.data.target_fric_radps[0] = 0;
     ctx->_ctx.data.target_fric_radps[1] = 0;
-    ctx->_ctx.data.fric_pid_active      = true;
 
+    ctx->_ctx.booster_cfg.motor.trigger->enable();
     ctx->_ctx.data.trig_mode            = data_ctx_t::trig_mode_e::SPEED;
     ctx->_ctx.data.target_trig_radps    = 0;
-    ctx->_ctx.data.trig_pid_active      = true;
 }
 
 void shoot_17mm_control_t::state_stop_t::execute(owner *ctx)
@@ -23,10 +24,13 @@ void shoot_17mm_control_t::state_stop_t::execute(owner *ctx)
 
     if (std::abs(ctx->_ctx.data.current_fric_radps[0]) < 10 &&
         std::abs(ctx->_ctx.data.current_fric_radps[1]) < 10)
-        ctx->_ctx.data.fric_pid_active = false;
+    {
+        ctx->_ctx.booster_cfg.motor.fric[0]->enable();
+        ctx->_ctx.booster_cfg.motor.fric[1]->enable();            
+    }
 
     if (std::abs(ctx->_ctx.data.current_trig_radps) < 0.01f)
-        ctx->_ctx.data.trig_pid_active = false;
+        ctx->_ctx.booster_cfg.motor.trigger->disable();
 }
 
 void shoot_17mm_control_t::state_stop_t::exit(owner *ctx)

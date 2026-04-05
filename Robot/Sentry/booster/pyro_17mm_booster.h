@@ -7,8 +7,7 @@
 #include "pyro_module_base.h"
 #include "pyro_dji_motor_drv.h"
 #include "pyro_17mm_config.h"
-
-#define FIRE_CHECK false
+#include "pyro_func_control.h"
 
 namespace pyro
 {
@@ -19,7 +18,6 @@ struct booster_cmd_t : cmd_base_t
     bool continue_shoot;        // 触发连发
     bool fire_licence{}; // 发射许可，为false时拨弹盘绝对不允许转动
 
-    uint16_t ammo_count{};      // 剩余发弹量（裁判系统反馈）
     uint8_t power_heat{};       // 当前热量（除以10 0~26）
     float current_bullet_mps{}; // 当前弹速（裁判系统反馈）
 

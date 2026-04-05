@@ -60,8 +60,8 @@ extern "C"
                             UART_PARITY_NONE);
         supercap_drv_t::get_instance()->start_rx();
 #endif
-
-        vTaskDelete(nullptr);
+    
+        osThreadTerminate(NULL);
     }
 }
 } // namespace pyro

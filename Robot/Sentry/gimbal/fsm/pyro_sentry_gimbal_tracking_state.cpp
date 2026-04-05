@@ -33,7 +33,7 @@ void gimbal_t::fsm_active_t::state_tracking_t::execute(gimbal_t *owner)
                        owner->_ctx.data.current_yaw_rad));
 
     // ------------------没经过测试，但是我觉得这样就可以-----------------
-    // if (owner->_ctx.data.aim_imu_max_yaw <
+    // while (owner->_ctx.data.aim_imu_max_yaw <
     // owner->_ctx.data.aim_imu_min_yaw)
     // {
     //     owner->_ctx.data.aim_imu_max_yaw += 2 * PI;

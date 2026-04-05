@@ -146,8 +146,8 @@ extern "C"
                 rud_cmd_ptr->mode = cmd_base_t::mode_t::PASSIVE;
                 yaw_cmd_ptr->mode = cmd_base_t::mode_t::PASSIVE;
             }
-            yaw_cmd_ptr->nav_enable = static_cast<bool>(raw_data[5]);
-            rud_cmd_ptr->follow_yaw = static_cast<bool>(raw_data[4] & 0x01);
+            yaw_cmd_ptr->nav_enable = raw_data[4] >> 2 & 0x01;
+            rud_cmd_ptr->follow_yaw = raw_data[4] & 0x01;
             if (cmd_base_t::mode_t::PASSIVE == yaw_cmd_ptr->mode)
             {
                 yaw_cmd_ptr->target_yaw_imu_angle =
@@ -167,7 +167,7 @@ extern "C"
                 yaw_cmd_ptr->target_yaw_imu_angle -=
                     static_cast<float>(static_cast<int8_t>(raw_data[3])) /
                     127.0f * 0.005f;
-                memset(&nav2mcu_msg, 0, sizeof(nav2mcu_msg));
+                nav2mcu_msg = {};
             }
             else
             {
@@ -212,7 +212,7 @@ extern "C"
             static_cast<uint8_t>(referee_data.shoot.initial_speed -
                                  static_cast<float>(bullet_speed_int)) *
             100;
-        uint8_t enemy_color;
+        bool enemy_color;
         if (referee_data.robot_status.robot_id > 100)
             enemy_color = 1;
         else
@@ -226,10 +226,10 @@ extern "C"
         can_tx_drv_t::clear(0x102);
         can_tx_drv_t::add_data(0x102, 8, bullet_speed_int);
         can_tx_drv_t::add_data(0x102, 8, bullet_speed_dec);
-        can_tx_drv_t::add_data(0x102, 8, enemy_color);
         can_tx_drv_t::add_data(0x102, 8, power_heat);
         can_tx_drv_t::add_data(0x102, 8, in_aim);
         can_tx_drv_t::add_data(0x102, 1, game_started);
+        can_tx_drv_t::add_data(0x102, 1, enemy_color);
         can_tx_drv_t::add_data(0x102, 1, scan);
         can_tx_drv_t::send(0x102, can_hub_t::get_instance()->hub_get_can_obj(
                                       can_hub_t::which_can::can3));
