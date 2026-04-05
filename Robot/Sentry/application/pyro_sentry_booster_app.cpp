@@ -23,9 +23,9 @@ static TaskHandle_t booster_thread_handle = nullptr;
 
 void booster_config(booster_cfg_t &cfg)
 {
-    cfg.motor.fric[0] = new dji_m3508_motor_drv_t(dji_motor_tx_frame_t::id_3,
+    cfg.motor.fric[0] = new dji_m3508_motor_drv_t(dji_motor_tx_frame_t::id_2,
                                                   can_hub_t::can1); // 右摩擦轮
-    cfg.motor.fric[1] = new dji_m3508_motor_drv_t(dji_motor_tx_frame_t::id_2,
+    cfg.motor.fric[1] = new dji_m3508_motor_drv_t(dji_motor_tx_frame_t::id_3,
                                                   can_hub_t::can1); // 左摩擦轮
     cfg.motor.trigger =
         new dji_m2006_motor_drv_t(dji_motor_tx_frame_t::id_1, can_hub_t::can1);
@@ -69,7 +69,7 @@ extern "C"
                 auto_fire)
             {
                 down_time++;
-                if (down_time > 200)
+                if (down_time > 50000)
                 {
                     booster_cmd_ptr->continue_shoot = true;
                     booster_cmd_ptr->single_shoot   = false;

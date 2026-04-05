@@ -8,6 +8,7 @@
 #include "pyro_dji_motor_drv.h"
 #include "pyro_17mm_config.h"
 #include "pyro_func_control.h"
+#include "pyro_dwt_drv.h"
 
 namespace pyro
 {
@@ -76,6 +77,7 @@ class shoot_17mm_control_t final
     static void _trig_control(shoot_17mm_control_t *ctx);
     static void _fire_check(booster_ctx_t *ctx);
     static void _send_motor_command(booster_ctx_t *ctx);
+    static void _jam_judge(booster_ctx_t *ctx);
 
     struct data_ctx_t
     {
@@ -155,6 +157,12 @@ class shoot_17mm_control_t final
         void execute(owner *ctx) override;
         void exit(owner *ctx) override;
     };
+    struct state_reverse_t : public state_t<owner>
+    {
+        void enter(owner *ctx) override;
+        void execute(owner *ctx) override;
+        void exit(owner *ctx) override;
+    };
 
     fsm_t<owner> _main_fsm;
     state_stop_t _state_stop;
@@ -163,6 +171,7 @@ class shoot_17mm_control_t final
     state_single_bullet_t _state_single_bullet;
     state_continue_bullet_t _state_continue_bullet;
     state_done_t _state_done;
+    state_reverse_t _state_reverse;
 };
 
 } // namespace pyro

@@ -14,6 +14,12 @@ void shoot_17mm_control_t::state_continue_bullet_t::enter(owner *ctx)
 
 void shoot_17mm_control_t::state_continue_bullet_t::execute(owner *ctx)
 {
+    if (!ctx->_ctx.cmd->is_fric_on)
+    {
+        this->request_switch(&ctx->_state_stop);
+        return;
+    }
+    
     if (!ctx->_ctx.cmd->continue_shoot)
     {
         this->request_switch(&ctx->_state_done);

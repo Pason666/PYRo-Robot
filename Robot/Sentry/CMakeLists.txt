@@ -1,8 +1,8 @@
 # =========================================================================
 # 1. 显式定义当前编译的板子类型（在这里切换 GIMBAL_BOARD 或 CHASSIS_BOARD）
 # =========================================================================
-# set(BOARD "GIMBAL_BOARD")
-set(BOARD "CHASSIS_BOARD")
+set(BOARD "GIMBAL_BOARD")
+# set(BOARD "CHASSIS_BOARD")
 
 # =========================================================================
 # 2. 声明Hero目标文件库（OBJECT库，仅编译目标文件不链接，保留原工程逻辑）
@@ -40,6 +40,7 @@ if (BOARD STREQUAL "GIMBAL_BOARD")
         Booster/fsm/pyro_17mm_single_state.cpp
         Booster/fsm/pyro_17mm_continue_state.cpp
         Booster/fsm/pyro_17mm_done_state.cpp
+        Booster/fsm/pyro_17mm_reverse_state.cpp
 
         pyro_mission_planner.cpp
         pyro_init_thread.cpp
