@@ -173,14 +173,14 @@ extern "C"
             {
                 rud_cmd_ptr->vx                   = nav2mcu_msg.data.vx;
                 rud_cmd_ptr->vy                   = nav2mcu_msg.data.vy;
-                if (nav2mcu_msg.data.wz != 0)
-                {
-                    rud_cmd_ptr->wz = nav2mcu_msg.data.wz;
-                }
-                else
-                {
+                // if (nav2mcu_msg.data.wz != 0)
+                // {
+                //     rud_cmd_ptr->wz = nav2mcu_msg.data.wz;
+                // }
+                // else
+                // {
                     rud_cmd_ptr->wz = 10;
-                }
+                // }
                 yaw_cmd_ptr->target_yaw_imu_angle = nav2mcu_msg.data.yaw;
             }
 
@@ -194,7 +194,7 @@ extern "C"
         can_rx_drv_t::get_data(can_hub_t::which_can::can3, 0x103, raw_data);
         float imu_angle;
         memcpy(&imu_angle, raw_data.data(), 4);
-        if (imu_angle == 0)
+        if (fabs(imu_angle) > 180)
             return;
         yaw_cmd_ptr->current_yaw_imu_rad = imu_angle / 180 * PI;
     }
@@ -284,6 +284,7 @@ extern "C"
         // 初始化区域
         can_rx_drv_t::subscribe(can_hub_t::which_can::can3, 0x123);
         can_rx_drv_t::subscribe(can_hub_t::which_can::can3, 0x103);
+
         rud_cmd_ptr = new rud_cmd_t();
         rud_cfg_ptr = new rud_cfg_t();
         yaw_cmd_ptr = new yaw_cmd_t();

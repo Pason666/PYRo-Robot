@@ -47,7 +47,7 @@ void gimbal_t::fsm_active_t::state_scanning_t::execute(owner *owner)
     }
     else
     {
-        owner->_ctx.data.target_pitch_rad -= 0.0002f;
+        owner->_ctx.data.target_pitch_rad -= 0.0004f;
         if (owner->_ctx.data.target_pitch_rad <=
             owner->_ctx.gimbal_config.pitch_min_rad)
             pitch_direction = UP;

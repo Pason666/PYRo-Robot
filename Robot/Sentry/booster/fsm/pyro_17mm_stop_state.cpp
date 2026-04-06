@@ -25,8 +25,8 @@ void shoot_17mm_control_t::state_stop_t::execute(owner *ctx)
     if (std::abs(ctx->_ctx.data.current_fric_radps[0]) < 10 &&
         std::abs(ctx->_ctx.data.current_fric_radps[1]) < 10)
     {
-        ctx->_ctx.booster_cfg.motor.fric[0]->enable();
-        ctx->_ctx.booster_cfg.motor.fric[1]->enable();            
+        ctx->_ctx.booster_cfg.motor.fric[0]->disable();
+        ctx->_ctx.booster_cfg.motor.fric[1]->disable();
     }
 
     if (std::abs(ctx->_ctx.data.current_trig_radps) < 0.01f)

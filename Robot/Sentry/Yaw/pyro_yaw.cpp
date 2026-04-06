@@ -3,6 +3,11 @@
 //
 #include "pyro_yaw.h"
 
+#include "pyro_com_canrx.h"
+
+uint8_t a;
+float c_imu_angle{};
+
 namespace pyro
 {
 float yaw{}, pitch{}, roll{};
@@ -54,18 +59,15 @@ void yaw_t::_update_feedback()
 
     _ctx.data.chassis_wz = chassis_yaw_radps;
 
-    _ctx.data.current_yaw_imu_angle =
-        wrap2pi_f32(yaw - _ctx.data.current_yaw_angle);
-
     // yaw电机当前角速度
     _ctx.data.current_yaw_radps =
         _ctx.yaw_config.motor.yaw->get_current_rotate();
+
+    a = _ctx.yaw_config.motor.yaw->get_error_code();
 }
 
 void yaw_t::_yaw_control(yaw_ctx_t *ctx)
 {
-
-
     ctx->data.out_yaw_torque = ctx->yaw_config.pid.yaw_spd_pid->calculate(
         ctx->data.out_yaw_radps, ctx->data.current_yaw_radps);
 }

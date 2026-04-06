@@ -40,6 +40,8 @@ void gimbal_t::_update_feedback()
         _ctx.gimbal_config.yaw_offset;
     _ctx.data.current_yaw_rad = wrap2pi_f32(_ctx.data.current_yaw_rad);
 
+    test_current_pos = _ctx.data.current_yaw_rad;
+
     _ctx.data.current_yaw_radps =
         _ctx.gimbal_config.motor.yaw->get_current_rotate();
 }

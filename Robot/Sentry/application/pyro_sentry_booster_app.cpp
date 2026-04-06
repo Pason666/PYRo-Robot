@@ -69,7 +69,7 @@ extern "C"
                 auto_fire)
             {
                 down_time++;
-                if (down_time > 200)
+                if (down_time > 20000)
                 {
                     booster_cmd_ptr->continue_shoot = true;
                     booster_cmd_ptr->single_shoot   = false;
